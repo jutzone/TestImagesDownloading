@@ -1,6 +1,6 @@
 # TestImagesDownloading
 
-Async loading of images with 4 modes:
+Asynchronous loading of images with 4 modes:
 1. AllAtOnce: waiting for all images to be loaded, then shows them together
 2. ShowWhenReady: waiting each image separately and showing it when ready
 3. OneByOne:
