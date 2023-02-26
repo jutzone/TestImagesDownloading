@@ -88,6 +88,10 @@ public class CoreController : MonoBehaviour
                     if (loadingResultsContainer.Contains(counter) && cards[i].IsHide)
                     {
                         cards[counter].IsHide = false;
+                        while (reversedContainer.Count - 1 < counter)
+                        {
+                            await Task.Yield();
+                        }
                         counter++;
                     }
                 }
