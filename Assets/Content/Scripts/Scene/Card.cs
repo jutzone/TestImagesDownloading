@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine.Networking;
 using UnityEngine.Events;
-
+using DG.Tweening;
 public class Card : MonoBehaviour, ICard
 {
     [SerializeField] private Image innerImage, outerImage;
@@ -30,6 +30,7 @@ public class Card : MonoBehaviour, ICard
         }
     }
     public UnityEvent<int> CardLoaded;
+    public UnityEvent<int> CardReversed;
     public void DisposeContent()
     {
         innerImage.sprite = null;
@@ -37,18 +38,37 @@ public class Card : MonoBehaviour, ICard
 
     public void ShowCard()
     {
-        Debug.Log("show");
-        outerImage.gameObject.SetActive(false);
+        Vector3 startPos = transform.position;
+        innerImage.DOColor(Color.white, 4f);
+        transform.DOScale(new Vector3(1.1f, 1.1f, 1.1f), 1f);
+        transform.DOMove(new Vector3(startPos.x + 25, startPos.y + 25, startPos.z), 1f);
+        transform.DORotate(new Vector3(0, 90, 0), 1f).OnComplete(() =>
+        {
+            outerImage.gameObject.SetActive(false);
+            CardReversed.Invoke(transform.GetSiblingIndex());
+            transform.DOScale(new Vector3(1f, 1f, 1f), 1f);
+            transform.DOMove(startPos, 1f);
+            transform.DORotate(new Vector3(0, 180, 0), 1f);//.OnComplete(() => CardReversed.Invoke(transform.GetSiblingIndex()));
+        });
+
     }
     public void HideCard()
     {
-        Debug.Log("hide");
-        outerImage.gameObject.SetActive(true);
+        Vector3 startPos = transform.position;
+        innerImage.DOColor(Color.black, 0.5f);
+        transform.DOScale(new Vector3(1.1f, 1.1f, 1.1f), 0.2f);
+        transform.DOMove(new Vector3(startPos.x + 25, startPos.y + 25, startPos.z), 0.2f);
+        transform.DORotate(new Vector3(0, 90, 0), 0.2f).OnComplete(() =>
+        {
+            outerImage.gameObject.SetActive(true);
+            transform.DOScale(new Vector3(1f, 1f, 1f), 0.2f);
+            transform.DOMove(startPos, 0.2f);
+            transform.DORotate(new Vector3(0, 0, 0), 0.2f);
+        });
     }
 
     public void LoadContent()
     {
-        Debug.Log("card. load content");
         var url = $"https://picsum.photos/id/{UnityEngine.Random.Range(0, 100)}/1080/1920";
         Task task = LoadImage(url, LoadingManager.Instance.cancelTokenSource.Token);
     }
@@ -56,12 +76,8 @@ public class Card : MonoBehaviour, ICard
 
     public async Task LoadImage(string url, CancellationToken token)
     {
-        Debug.Log("start task");
-        Debug.Log(url);
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        Debug.Log("request0");
         var result = request.SendWebRequest();
-        Debug.Log("request");
         while (!result.isDone)
         {
             await Task.Yield();
@@ -73,10 +89,15 @@ public class Card : MonoBehaviour, ICard
         }
         else
         {
-            Debug.Log("loading complete");
             var tex = ((DownloadHandlerTexture)request.downloadHandler).texture;
-            innerImage.sprite = Sprite.Create((Texture2D)tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
-            CardLoaded.Invoke(transform.GetSiblingIndex());
+
+            if (!token.IsCancellationRequested)
+            {
+                innerImage.sprite = Sprite.Create((Texture2D)tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
+                CardLoaded.Invoke(transform.GetSiblingIndex());
+            }
+            else
+                Debug.Log("Loading Canceled");
         }
     }
 }

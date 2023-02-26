@@ -1,17 +1,7 @@
 using UnityEngine;
 using System.Threading;
+using System;
 
-
-public class TextureWithIndex
-{
-    public TextureWithIndex(Texture texture, int index)
-    {
-        this._texture = texture;
-        this._index = index;
-    }
-    public Texture _texture;
-    public int _index;
-}
 public class LoadingManager
 {
     private static LoadingManager _instance;
@@ -24,7 +14,6 @@ public class LoadingManager
             {
                 _instance = new LoadingManager();
                 _instance.cancelTokenSource = new CancellationTokenSource();
-                _instance.token = _instance.cancelTokenSource.Token;
             }
             return _instance;
         }
@@ -34,5 +23,5 @@ public class LoadingManager
         }
     }
     public CancellationTokenSource cancelTokenSource;
-    CancellationToken token;
+
 }
