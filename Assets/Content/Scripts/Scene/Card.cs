@@ -100,4 +100,10 @@ public class Card : MonoBehaviour, ICard
                 Debug.Log("Loading Canceled");
         }
     }
+
+    private void OnDisable()
+    {
+        CardLoaded.RemoveAllListeners();
+        CardReversed.RemoveAllListeners();
+    }
 }

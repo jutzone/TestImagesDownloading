@@ -23,4 +23,19 @@ public class UIController : MonoBehaviour
             CoreController.ShowType = (ShowType)s;
         });
     }
+
+    private void OnDisable()
+    {
+        loadButton.onClick.RemoveListener(() =>
+       {
+           CoreController.StartLoading.Invoke();
+       });
+        cancelButton.onClick.AddListener(() => CoreController.CancelLoading.Invoke());
+
+        showTypeDropdown.onValueChanged.RemoveListener((s) =>
+        {
+            showTypeDropdown.Hide();
+            CoreController.ShowType = (ShowType)s;
+        });
+    }
 }

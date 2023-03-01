@@ -9,8 +9,8 @@ public interface ICard
         get;
         set;
     }
-    public abstract void ShowCard();
-    public abstract void HideCard();
-    public abstract void LoadContent();
-    public abstract void DisposeContent();
+    public void ShowCard();
+    public void HideCard();
+    public void LoadContent();
+    public void DisposeContent();
 }

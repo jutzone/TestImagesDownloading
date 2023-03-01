@@ -17,10 +17,6 @@ public class LoadingManager
             }
             return _instance;
         }
-        private set
-        {
-            Instance = value;
-        }
     }
     public CancellationTokenSource cancelTokenSource;
 
